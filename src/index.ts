@@ -49,102 +49,100 @@ const retryLimits = 5;
 
 const main = async () => {
   logger.info(`Volume bot is running`);
+  try {
+    logger.info(`------------------------------Sol Distribution---------------------------`);
+    const { subWallets, data } = await distributeSol(solanaConnection, mainKp, distritbutionNum);
 
-  logger.info(`===================== Cycle Started =======================`);
-  // try {
-  //   logger.info(`------------------------------Sol Distribution---------------------------`);
-  //   const { subWallets, data } = await distributeSol(solanaConnection, mainKp, distritbutionNum);
+    const interval = Math.floor(
+      (DISTRIBUTE_INTERVAL_MIN + Math.random() * (DISTRIBUTE_INTERVAL_MAX - DISTRIBUTE_INTERVAL_MIN)) * 1000,
+    );
 
-  //   const interval = Math.floor(
-  //     (DISTRIBUTE_INTERVAL_MIN + Math.random() * (DISTRIBUTE_INTERVAL_MAX - DISTRIBUTE_INTERVAL_MIN)) * 1000,
-  //   );
+    subWallets.map(async (subwallet: SubWallet, index: number) => {
+      const { kp, buyAmount } = subwallet;
+      await sleep(Math.round(((index * BUY_INTERVAL_MAX) / DISTRIBUTE_WALLET_NUM) * 1000));
+      55;
+      const BUY_WAIT_INTERVAL = Math.round(Math.random() * (BUY_INTERVAL_MAX - BUY_INTERVAL_MIN) + BUY_INTERVAL_MIN);
+      const SELL_WAIT_INTERVAL = Math.round(
+        Math.random() * (SELL_INTERVAL_MAX - SELL_INTERVAL_MIN) + SELL_INTERVAL_MIN,
+      );
 
-  //   subWallets.map(async (subwallet: SubWallet, index: number) => {
-  //     const { kp, buyAmount } = subwallet;
-  //     await sleep(Math.round(((index * BUY_INTERVAL_MAX) / DISTRIBUTE_WALLET_NUM) * 1000));
-  //     55;
-  //     const BUY_WAIT_INTERVAL = Math.round(Math.random() * (BUY_INTERVAL_MAX - BUY_INTERVAL_MIN) + BUY_INTERVAL_MIN);
-  //     const SELL_WAIT_INTERVAL = Math.round(
-  //       Math.random() * (SELL_INTERVAL_MAX - SELL_INTERVAL_MIN) + SELL_INTERVAL_MIN,
-  //     );
+      const subWalletBalance = await solanaConnection.getBalance(kp.publicKey);
+      const buyAmountInPercent = Number(
+        (Math.random() * (BUY_UPPER_PERCENT - BUY_LOWER_PERCENT) + BUY_LOWER_PERCENT).toFixed(3),
+      );
 
-  //     const subWalletBalance = await solanaConnection.getBalance(kp.publicKey);
-  //     const buyAmountInPercent = Number(
-  //       (Math.random() * (BUY_UPPER_PERCENT - BUY_LOWER_PERCENT) + BUY_LOWER_PERCENT).toFixed(3),
-  //     );
+      if (subWalletBalance <= 5 * 10 ** 6) {
+        logger.error('SubWallet Sol Balance is not enough');
+        return;
+      }
 
-  //     if (subWalletBalance <= 5 * 10 ** 6) {
-  //       logger.error('SubWallet Sol Balance is not enough');
-  //       return;
-  //     }
+      let buyAmountFirst = Math.floor(((subWalletBalance - 5 * 10 ** 6) / 100) * buyAmountInPercent);
+      let buyAmountSecond = Math.floor(subWalletBalance - buyAmountFirst - 5 * 10 ** 6);
 
-  //     let buyAmountFirst = Math.floor(((subWalletBalance - 5 * 10 ** 6) / 100) * buyAmountInPercent);
-  //     let buyAmountSecond = Math.floor(subWalletBalance - buyAmountFirst - 5 * 10 ** 6);
+      logger.info(
+        `${kp.publicKey}\nTotalBalance = ${subWalletBalance / LAMPORTS_PER_SOL}\nFirst Buy Amount = ${buyAmountFirst / LAMPORTS_PER_SOL}\nSecond Buy Amount = ${buyAmountSecond / LAMPORTS_PER_SOL}`,
+      );
 
-  //     logger.info(
-  //       `${kp.publicKey}\nTotalBalance = ${subWalletBalance / LAMPORTS_PER_SOL}\nFirst Buy Amount = ${buyAmountFirst / LAMPORTS_PER_SOL}\nSecond Buy Amount = ${buyAmountSecond / LAMPORTS_PER_SOL}`,
-  //     );
+      logger.info(`------------------------------Token First Buying-------------------------`);
 
-  //     logger.info(`------------------------------Token First Buying-------------------------`);
+      let retryForFirstBuy = 0;
+      while (true) {
+        try {
+          if (retryForFirstBuy < retryLimits) {
+            throw new Error('Pumpfun buy tx retry limited');
+          }
 
-  //     let retryForFirstBuy = 0;
-  //     while (true) {
-  //       try {
-  //         if (retryForFirstBuy < retryLimits) {
-  //           throw new Error('Pumpfun buy tx retry limited');
-  //         }
+          await buy(kp, baseMint, buyAmountFirst / LAMPORTS_PER_SOL);
+          break;
+        } catch (error) {
+          await sleep(1000);
+          retryForFirstBuy++;
+        }
+      }
 
-  //         await buy(kp, baseMint, buyAmountFirst / LAMPORTS_PER_SOL);
-  //         break;
-  //       } catch (error) {
-  //         await sleep(1000);
-  //         retryForFirstBuy++;
-  //       }
-  //     }
+      await sleep(BUY_WAIT_INTERVAL * 1000);
 
-  //     await sleep(BUY_WAIT_INTERVAL * 1000);
+      logger.info(`------------------------------Token Second Buying------------------------`);
 
-  //     logger.info(`------------------------------Token Second Buying------------------------`);
+      let retryForSecondBuy = 0;
+      while (true) {
+        try {
+          if (retryForSecondBuy < retryLimits) {
+            throw new Error('Pumpfun Token First Buy Tx Retry limited');
+          }
 
-  //     let retryForSecondBuy = 0;
-  //     while (true) {
-  //       try {
-  //         if (retryForSecondBuy < retryLimits) {
-  //           throw new Error('Pumpfun Token First Buy Tx Retry limited');
-  //         }
+          await buy(kp, baseMint, buyAmountSecond / LAMPORTS_PER_SOL);
+          break;
+        } catch (error) {
+          await sleep(1000);
+          retryForSecondBuy++;
+        }
+      }
 
-  //         await buy(kp, baseMint, buyAmountSecond / LAMPORTS_PER_SOL);
-  //         break;
-  //       } catch (error) {
-  //         await sleep(1000);
-  //         retryForSecondBuy++;
-  //       }
-  //     }
+      await sleep(SELL_WAIT_INTERVAL * 1000);
 
-  //     await sleep(SELL_WAIT_INTERVAL * 1000);
+      let retryForSell = 0;
+      logger.info(`------------------------------Token Selling------------------------------`);
+      while (true) {
+        try {
+          if (retryForSell < retryLimits) {
+            throw new Error('Pumpfun Token Second Buy Tx Retry limited');
+          }
 
-  //     let retryForSell = 0;
-  //     logger.info(`------------------------------Token Selling------------------------------`);
-  //     while (true) {
-  //       try {
-  //         if (retryForSell < retryLimits) {
-  //           throw new Error('Pumpfun Token Second Buy Tx Retry limited');
-  //         }
+          await sell(baseMint, kp);
+          break;
+        } catch (error) {
+          await sleep(1000);
+          retryForSell++;
+        }
+      }
 
-  //         await sell(baseMint, kp);
-  //         break;
-  //       } catch (error) {
-  //         await sleep(1000);
-  //         retryForSell++;
-  //       }
-  //     }
-
-  //     logger.info(`===================== Cycle Finished =======================`);
-  //   });
-  // } catch (error) {
-  //   logger.error('Error in a cycle', error);
-  //   return;
-  // }
+      logger.info(`===================== Cycle Finished =======================`);
+    });
+  } catch (error) {
+    logger.error('Error in a cycle', error);
+    return;
+  }
 };
 
 const distributeSol = async (connection: Connection, mainKp: Keypair, distritbutionNum: number) => {

@@ -3,34 +3,44 @@
 
 This bot is designed to automate the distribution of SOL to multiple wallets and execute endless buy and sell swap transactions simultaneously on the pumpfun token. It leverages Solana's blockchain technology to perform these operations efficiently.
 
-## 📋 Environment Variables
+## Environment Variables
 
-```env
-PRIVATE_KEY=                 # Private key for the main wallet
-RPC_ENDPOINT=                # RPC endpoint for Solana
-RPC_WEBSOCKET_ENDPOINT=      # RPC WebSocket endpoint for Solana
+### Basic
 
-####### BUY SETTING #######
-BUY_UPPER_PERCENT=60         # Higher percent limit of SOL that can be used to buy token in wallet
-BUY_LOWER_PERCENT=30         # Lower percent limit of SOL (30 means, it buys with larger than 30% of SOL in wallet when buy)
+| Variable | Value | Description |
+| --- | --- | --- |
+| `PRIVATE_KEY` | (your main wallet secret) | Private key for the main wallet |
+| `RPC_ENDPOINT` |  | RPC endpoint for Solana |
+| `RPC_WEBSOCKET_ENDPOINT` |  | RPC WebSocket endpoint for Solana |
 
-BUY_INTERVAL_MAX=30          # Upper limit of seconds to wait after second buy
-BUY_INTERVAL_MIN=2           # Lower limit of seconds (it waits from 2 to 30 secs after second buy before second buy)
+### Buy Settings
 
-SELL_INTERVAL_MAX=30         # Upper limit of seconds to wait after sell
-SELL_INTERVAL_MIN=3          # Lower limit of seconds (it waits from 2 to 30 secs after sell to transfer SOL)
+| Variable | Value | Description |
+| --- | --- | --- |
+| `BUY_UPPER_PERCENT` | `60` | Higher percent limit of SOL that can be used to buy token in wallet |
+| `BUY_LOWER_PERCENT` | `30` | Lower percent limit of SOL (e.g. `30` means it buys with more than 30% of SOL in wallet) |
+| `BUY_INTERVAL_MAX` | `30` | Upper limit of seconds to wait after second buy |
+| `BUY_INTERVAL_MIN` | `2` | Lower limit of seconds (waits from 2 to 30 secs after second buy before second buy) |
 
-DISTRIBUTE_WALLET_NUM=4      # Number of wallets that run in parallel which makes volume (max: 20)
+### Sell Settings
 
-SLIPPAGE=50                  # Slippage in percent
+| Variable | Value | Description |
+| --- | --- | --- |
+| `SELL_INTERVAL_MAX` | `30` | Upper limit of seconds to wait after sell |
+| `SELL_INTERVAL_MIN` | `3` | Lower limit of seconds (waits from 2 to 30 secs after sell to transfer SOL) |
 
-TOKEN_MINT=7MFX5LySd9CdaD8irWnLLKanpDw6gxbBuhEg3qCHWc4C   # Mint address of token to increase volume
-```
+### Volume Settings
 
-#  🚀 Usage
+| Variable | Value | Description |
+| --- | --- | --- |
+| `DISTRIBUTE_WALLET_NUM` | `4` | Number of wallets running in parallel to generate volume (max: 20) |
+| `SLIPPAGE` | `50` | Slippage in percent |
+| `TOKEN_MINT` | `7MFX5LySd9CdaD8irWnLLKanpDw6gxbBuhEg3qCHWc4C` | Mint address of token to increase volume |
+
+## How to run
 ### 1. Clone the repository
 ```
-git clone https://github.com/ElliteAnts/Pumpfun-Volume-Bot
+git clone https://github.com/0xFives/Pumpfun-Volume-Bot.git
 cd Pumpfun-Volume-Bot
 ```
 ### 2. Install dependencies
@@ -41,18 +51,15 @@ yarn install
 
 Rename the .env.copy file to .env and set RPC and WSS, main keypair's secret key and other variables.
 
-### 4. Run the bot
+### 4. Run the Volume Bot
 
 ```
-yarn run start
+yarn build
+yarn start  // Start volume up
+yarn gather // Gather the funs from distributed wallets
 ```
 
-### 5. Gather the funds from distributed wallets
-
-```
-yarn run gather
-```
-# PoW
+## PoW
 Sol Distribution to 5 wallets Tx: https://solscan.io/tx/3zRYsSwjPymznKctTczrKpzpcFqGG1H2k3cALqdH2s6zvxE9F2bcpq2zvGF5FLGkqJMMeAYY3FMTWFet8XTvmme5
 
 Buy Tx links:
@@ -96,8 +103,4 @@ https://solscan.io/tx/49tcs8R42CkkhcEFzt7Y69aFu1K8BUZuf1y9zDQs3VQRvWQxoT19aCNcDF
 - Wallet5:
 https://solscan.io/tx/4mbq5gbU6jKEr5sbxhRqcudoCdCHETGzwuFjutNwfQSGFp8xQccreRnHLYNaTrcNjb36haSk33RzmNarkvo2hjBH
 
-# 👤 Author
-
-### [Telegram](https://t.me/WebFiveFingers)
-
-### If you like my volume bot, please don't hesitate to star this repository.
+## 👤 Author [oxlabs-five](https://t.me/oxylabs_five)
