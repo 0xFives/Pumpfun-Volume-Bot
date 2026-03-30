@@ -1,7 +1,13 @@
 
 # Pumpfun VolumeBot
 
-This bot is designed to automate the distribution of SOL to multiple wallets and execute endless buy and sell swap transactions simultaneously on the pumpfun token. It leverages Solana's blockchain technology to perform these operations efficiently.
+Pump.fun Volume Bot — High-Performance Solana Trading & Volume Simulation Bot
+
+A production-grade Pump.fun volume bot built on Solana, designed to simulate organic trading activity, increase on-chain volume, and support token launch momentum.
+
+This bot features multi-wallet orchestration, randomized trading patterns, and low-latency execution to create realistic market behavior while maintaining efficiency and scalability.
+
+Built for developers and traders looking to experiment with Pump.fun volume strategies, trading automation, and Solana bot infrastructure.
 
 ## Environment Variables
 
